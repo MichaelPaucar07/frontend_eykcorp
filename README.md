@@ -19,6 +19,8 @@ SPA en **Vue 3** para la gestión de clientes (listar, crear, editar y eliminar)
 
 ## Ejecución
 
+> Las instrucciones paso a paso, con requisitos y solución de problemas, también están en [`INSTRUCCIONES_EJECUCION.txt`](INSTRUCCIONES_EJECUCION.txt).
+
 ### Opción 1: aplicación completa con Docker (recomendada)
 
 El `docker-compose.yml` está en el repositorio del backend y levanta **PostgreSQL + backend + este frontend**. Ambos repositorios deben estar en esta estructura:

@@ -1,0 +1,170 @@
+===============================================================================
+  PRUEBA TÉCNICA EYK CORP - FRONTEND (VUE 3)
+  INSTRUCCIONES DE EJECUCIÓN
+===============================================================================
+
+Repositorios:
+  - Frontend (este repositorio): https://github.com/MichaelPaucar07/frontend_eykcorp
+  - Backend  (API REST):         https://github.com/MichaelPaucar07/backend_eykcorp
+
+El frontend consume la API del backend, por lo que el backend debe estar
+corriendo para que la aplicación funcione.
+
+
+-------------------------------------------------------------------------------
+1. REQUISITOS
+-------------------------------------------------------------------------------
+
+  Con Docker (opción recomendada):
+    - Git
+    - Docker Desktop instalado y en ejecución
+
+  En modo desarrollo:
+    - Node.js 22.18 o superior (npm incluido)
+    - Backend corriendo en http://localhost:8081
+
+  Puertos que deben estar libres:
+    - 3000  -> Frontend con Docker (Nginx)
+    - 5173  -> Frontend en modo desarrollo (Vite)
+
+
+-------------------------------------------------------------------------------
+2. CLONAR LOS REPOSITORIOS
+-------------------------------------------------------------------------------
+
+  El docker-compose.yml que levanta toda la aplicación está en el repositorio
+  del backend y construye este frontend desde la carpeta vecina. Ambos
+  repositorios deben quedar con esta estructura:
+
+    Repositories/
+    ├── Springboot/backend_eykcorp/
+    └── Vue/frontend_eykcorp/        <- este repositorio
+
+  Comandos:
+
+    mkdir -p Repositories/Springboot Repositories/Vue
+    git clone https://github.com/MichaelPaucar07/backend_eykcorp.git Repositories/Springboot/backend_eykcorp
+    git clone https://github.com/MichaelPaucar07/frontend_eykcorp.git Repositories/Vue/frontend_eykcorp
+
+
+===============================================================================
+  OPCIÓN A: APLICACIÓN COMPLETA CON DOCKER COMPOSE (RECOMENDADA)
+===============================================================================
+
+  Levanta PostgreSQL + backend + este frontend servido por Nginx.
+
+  Paso 1. Entrar a la carpeta del BACKEND (ahí está el docker-compose.yml):
+
+    cd Repositories/Springboot/backend_eykcorp
+
+  Paso 2. Crear el archivo de variables de entorno:
+
+    cp .env.example .env
+
+    (En Windows CMD: copy .env.example .env)
+
+  Paso 3. Construir y levantar los contenedores:
+
+    docker compose up -d --build
+
+  Paso 4. Verificar que los contenedores estén corriendo:
+
+    docker ps
+
+    Deben aparecer eykcorp_frontend, eykcorp_backend y eykcorp_postgres.
+
+  Paso 5. Abrir la aplicación en el navegador:
+
+    http://localhost:3000
+
+  Cómo funciona en Docker:
+
+    Navegador -> localhost:3000 -> Nginx (eykcorp_frontend)
+                                    ├── /        -> archivos de Vue (dist/)
+                                    └── /api/... -> backend:8081 -> postgres
+
+  Ver los logs de Nginx:
+    docker compose logs -f frontend
+
+
+===============================================================================
+  OPCIÓN B: MODO DESARROLLO
+===============================================================================
+
+  Paso 1. Levantar el backend (ver INSTRUCCIONES_EJECUCION.txt del backend).
+          La forma más rápida, desde la carpeta del backend:
+
+    cp .env.example .env
+    docker compose up -d postgres backend
+
+    Verificar: http://localhost:8081/clientes debe responder.
+
+  Paso 2. Entrar a la carpeta del frontend:
+
+    cd Repositories/Vue/frontend_eykcorp
+
+  Paso 3. Instalar las dependencias:
+
+    npm install
+
+  Paso 4. Levantar el servidor de desarrollo:
+
+    npm run dev
+
+  Paso 5. Abrir la aplicación en el navegador:
+
+    http://localhost:5173
+
+  Nota: el puerto 5173 está fijado en vite.config.js porque el backend solo
+  permite CORS desde ese origen. Si el puerto está ocupado, Vite muestra un
+  error en lugar de cambiarse a otro puerto.
+
+
+-------------------------------------------------------------------------------
+3. SCRIPTS DISPONIBLES
+-------------------------------------------------------------------------------
+
+  npm run dev        Servidor de desarrollo con recarga automática
+  npm run build      Build de producción en la carpeta dist/
+  npm run preview    Sirve localmente el build de producción
+  npm run lint       Revisión de código (Oxlint + ESLint)
+  npm run format     Formatea el código con Prettier
+
+
+-------------------------------------------------------------------------------
+4. VARIABLES DE ENTORNO
+-------------------------------------------------------------------------------
+
+  Ya vienen incluidas en el repositorio, no es necesario crearlas:
+
+    .env.development   VITE_API_URL=http://localhost:8081   (npm run dev)
+    .env.production    VITE_API_URL=/api                    (build / Docker)
+
+  En Docker, la dirección del backend para Nginx se define con la variable
+  BACKEND_URL (por defecto http://backend:8081).
+
+
+-------------------------------------------------------------------------------
+5. SOLUCIÓN DE PROBLEMAS
+-------------------------------------------------------------------------------
+
+  La aplicación muestra "No hay conexión con el servidor"
+    -> Verificar que el backend esté corriendo: http://localhost:8081/clientes
+    -> En modo desarrollo, confirmar que el frontend esté en el puerto 5173
+       (cualquier otro puerto es bloqueado por CORS).
+
+  "Port 5173 is already in use" al ejecutar npm run dev
+    -> Otro proceso usa el puerto (por ejemplo, otra terminal con npm run dev).
+       Cerrarlo y volver a ejecutar el comando.
+
+  Error de versión de Node al ejecutar npm install
+    -> Instalar Node.js 22.18 o superior.
+
+  "unable to prepare context" al ejecutar docker compose
+    -> Este repositorio no está en ../../Vue/frontend_eykcorp respecto al
+       backend. Clonarlo con la estructura del punto 2 o ajustar la variable
+       FRONTEND_PATH en el .env del backend.
+
+===============================================================================
+  Autor: Michael Paucar - https://github.com/MichaelPaucar07
+===============================================================================
