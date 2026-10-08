@@ -15,4 +15,10 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  // Puerto fijo: el backend solo permite CORS desde este origen.
+  // Con strictPort, si el puerto está ocupado Vite falla en lugar de usar otro.
+  server: {
+    port: 5173,
+    strictPort: true,
+  },
 })

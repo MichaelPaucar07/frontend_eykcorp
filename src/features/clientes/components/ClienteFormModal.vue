@@ -3,10 +3,12 @@ import { computed, reactive, ref } from 'vue'
 
 import BaseModal from '@/shared/components/BaseModal.vue'
 import FormField from '@/shared/components/FormField.vue'
+import PhoneField from '@/shared/components/PhoneField.vue'
 import {
   CLIENTE_LIMITS,
   emptyClienteForm,
   toClienteForm,
+  toClientePayload,
   validateClienteForm,
 } from '../models/cliente'
 import { clienteService } from '../services/cliente.service'
@@ -40,9 +42,10 @@ async function submit() {
 
   saving.value = true
   try {
+    const payload = toClientePayload(form)
     const saved = isEdit.value
-      ? await clienteService.actualizar(props.cliente.id, form)
-      : await clienteService.crear(form)
+      ? await clienteService.actualizar(props.cliente.id, payload)
+      : await clienteService.crear(payload)
     emit('saved', saved)
   } catch (error) {
     // El toast ya lo mostró el notifyInterceptor; aquí se marcan los campos
@@ -101,18 +104,16 @@ async function submit() {
         @update:model-value="clearError('correo')"
       />
 
-      <FormField
+      <PhoneField
         id="telefono"
-        v-model="form.telefono"
+        v-model:country="form.telefonoPais"
+        v-model:number="form.telefonoNumero"
         label="Teléfono"
-        type="tel"
-        inputmode="numeric"
-        placeholder="0991234567"
         required
-        :maxlength="CLIENTE_LIMITS.telefono"
         :error="errors.telefono"
         :disabled="saving"
-        @update:model-value="clearError('telefono')"
+        @update:number="clearError('telefono')"
+        @update:country="clearError('telefono')"
       />
     </form>
 

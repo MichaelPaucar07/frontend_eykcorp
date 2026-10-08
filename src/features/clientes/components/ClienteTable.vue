@@ -1,5 +1,6 @@
 <script setup>
 import { formatDateTime, initials } from '@/shared/utils/formatters'
+import { formatPhone } from '@/shared/utils/phone'
 
 // =========================================================
 // TABLA DE CLIENTES (presentacional: solo muestra y emite eventos)
@@ -61,7 +62,7 @@ defineEmits(['edit', 'delete'])
             </div>
           </td>
           <td>{{ cliente.correo }}</td>
-          <td>{{ cliente.telefono }}</td>
+          <td class="text-nowrap">{{ formatPhone(cliente.telefono) }}</td>
           <td class="text-secondary small">{{ formatDateTime(cliente.fechaCreacion) }}</td>
           <td class="text-end text-nowrap">
             <button
